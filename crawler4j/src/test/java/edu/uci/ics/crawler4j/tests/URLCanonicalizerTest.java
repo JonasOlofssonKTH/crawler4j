@@ -2,17 +2,50 @@ package edu.uci.ics.crawler4j.tests;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
 import java.nio.charset.Charset;
+import java.util.Arrays;
 
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import edu.uci.ics.crawler4j.url.URLCanonicalizer;
 
 public class URLCanonicalizerTest {
-
+	
+	private static boolean[] coverage = new boolean[10];
+	private static String fileName = "URLCanonicalizerTest.txt";
+	
+	@BeforeClass
+	public static void setBooleanArray() {
+		URLCanonicalizer.setCoverage(coverage);
+	}
+	
+	@AfterClass
+	public static void createFile() throws IOException {
+    	StringBuilder contents = new StringBuilder().append(Arrays.toString(coverage));
+    	int count = 0;
+    	for (int i = 0 ; i < coverage.length ; i++) {
+    		if(coverage[i]) {count++;}
+    	}
+    	float percentCovered = (float) count / coverage.length;
+    	
+    	contents.append("\n" + percentCovered + "%");
+		Writer output = new BufferedWriter(new FileWriter(new File(fileName)));
+		
+	    output.write(contents.toString());
+		output.close();
+		
+	}
+	
     @Test
     public void testCanonizalier() {
-
+    	
         assertEquals("http://www.example.com/display?category=foo%2Fbar%2Bbaz",
                      URLCanonicalizer.getCanonicalURL(
                          "http://www.example.com/display?category=foo/bar+baz"));

@@ -17,6 +17,13 @@
 
 package edu.uci.ics.crawler4j.url;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -25,6 +32,7 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -36,9 +44,15 @@ import java.util.Objects;
  * @author Yasser Ganjisaffar
  */
 public class URLCanonicalizer {
-
+	
+	static boolean[] coverage;
+	
+	public static void setCoverage(boolean coverage[]) {
+		URLCanonicalizer.coverage = coverage;
+	}
+	
     public static String getCanonicalURL(String url) {
-        return getCanonicalURL(url, null);
+        return getCanonicalURL(url, null); 
     }
 
     public static String getCanonicalURL(String href, String context) {
@@ -46,17 +60,20 @@ public class URLCanonicalizer {
     }
 
     public static String getCanonicalURL(String href, String context, Charset charset) {
-
+    	
+    	coverage[0]=true;
+    	
         try {
-            URL canonicalURL =
+        	URL canonicalURL =
                 new URL(UrlResolver.resolveUrl((context == null) ? "" : context, href));
 
             String host = canonicalURL.getHost().toLowerCase();
             if (Objects.equals(host, "")) {
+            	coverage[1]=true;
                 // This is an invalid Url.
                 return null;
             }
-
+            coverage[2]=true;
             String path = canonicalURL.getPath();
 
       /*
@@ -68,32 +85,39 @@ public class URLCanonicalizer {
 
             int idx = path.indexOf("//");
             while (idx >= 0) {
+            	coverage[3]=true;
                 path = path.replace("//", "/");
                 idx = path.indexOf("//");
             }
 
             while (path.startsWith("/../")) {
+            	coverage[4]=true;
                 path = path.substring(3);
             }
 
             path = path.trim();
 
             Map<String, String> params = createParameterMap(canonicalURL.getQuery());
+            
             final String queryString;
             if ((params != null) && !params.isEmpty()) {
+            	coverage[5]=true;
                 String canonicalParams = canonicalize(params, charset);
                 queryString = (canonicalParams.isEmpty() ? "" : ("?" + canonicalParams));
             } else {
+            	coverage[6]=true;
                 queryString = "";
             }
 
             if (path.isEmpty()) {
+            	coverage[7]=true;
                 path = "/";
             }
 
             //Drop default port: example.com:80 -> example.com
             int port = canonicalURL.getPort();
             if (port == canonicalURL.getDefaultPort()) {
+            	coverage[8]=true;
                 port = -1;
             }
 
@@ -104,9 +128,11 @@ public class URLCanonicalizer {
             return result.toExternalForm();
 
         } catch (MalformedURLException | URISyntaxException ex) {
+        	coverage[9]=true;
             return null;
         }
     }
+    
 
     /**
      * Takes a query string, separates the constituent name-value pairs, and
