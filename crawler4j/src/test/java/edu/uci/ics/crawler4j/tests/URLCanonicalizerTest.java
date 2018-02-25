@@ -18,31 +18,6 @@ import edu.uci.ics.crawler4j.url.URLCanonicalizer;
 
 public class URLCanonicalizerTest {
 	
-	private static boolean[] coverage = new boolean[10];
-	private static String fileName = "URLCanonicalizerTest.txt";
-	
-	@BeforeClass
-	public static void setBooleanArray() {
-		URLCanonicalizer.setCoverage(coverage);
-	}
-	
-	@AfterClass
-	public static void createFile() throws IOException {
-    	StringBuilder contents = new StringBuilder().append(Arrays.toString(coverage));
-    	int count = 0;
-    	for (int i = 0 ; i < coverage.length ; i++) {
-    		if(coverage[i]) {count++;}
-    	}
-    	float percentCovered = (float) count / coverage.length;
-    	
-    	contents.append("\n" + percentCovered + "%");
-		Writer output = new BufferedWriter(new FileWriter(new File(fileName)));
-		
-	    output.write(contents.toString());
-		output.close();
-		
-	}
-	
     @Test
     public void testCanonizalier() {
     	

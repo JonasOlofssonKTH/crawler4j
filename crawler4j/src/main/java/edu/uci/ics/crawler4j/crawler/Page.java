@@ -17,9 +17,14 @@
 
 package edu.uci.ics.crawler4j.crawler;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Writer;
 import java.nio.charset.Charset;
+import java.util.Arrays;
 
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
@@ -117,16 +122,27 @@ public class Page {
      *
      * @throws IOException Thrown when reading fails for any reason
      */
+    
+    static boolean[] coverage = new boolean[10];
+    
     protected byte[] toByteArray(HttpEntity entity, int maxBytes) throws IOException {
+    		coverage[0] = true;
         if (entity == null) {
+    			coverage[1] = true;
+             Page.createFile("toByteArray_coverage", coverage);
             return new byte[0];
+        } else {
+        		coverage[2] = true;
         }
         try (InputStream is = entity.getContent()) {
             int size = (int) entity.getContentLength();
             int readBufferLength = size;
 
             if (readBufferLength <= 0) {
+        			coverage[3] = true;
                 readBufferLength = 4096;
+            } else{
+    				coverage[4] = true;
             }
             // in case when the maxBytes is less than the actual page size
             readBufferLength = Math.min(readBufferLength, maxBytes);
@@ -140,15 +156,23 @@ public class Page {
             int dataLength;
 
             while ((dataLength = is.read(tmpBuff)) != -1) {
+        			coverage[5] = true;
                 if (maxBytes > 0 && (buffer.length() + dataLength) > maxBytes) {
+            			coverage[6] = true;
                     truncated = true;
                     dataLength = maxBytes - buffer.length();
+                } else{
+        				coverage[7] = true;
                 }
                 buffer.append(tmpBuff, 0, dataLength);
                 if (truncated) {
+            			coverage[8] = true;
                     break;
+                } else{
+        				coverage[9] = true;
                 }
             }
+            Page.createFile("toByteArray_coverage", coverage);
             return buffer.toByteArray();
         }
     }
@@ -160,33 +184,46 @@ public class Page {
      * @param maxBytes The maximum number of bytes to read
      * @throws Exception when load fails
      */
-    public void load(HttpEntity entity, int maxBytes) throws Exception {
+    
+    static boolean[] coverageLoad = new boolean[7];
 
+    public void load(HttpEntity entity, int maxBytes) throws Exception {
         contentType = null;
         Header type = entity.getContentType();
         if (type != null) {
+    			coverageLoad[0] = true;
             contentType = type.getValue();
+        } else {
+        		coverageLoad[1] = true;
         }
 
         contentEncoding = null;
         Header encoding = entity.getContentEncoding();
         if (encoding != null) {
+    			coverageLoad[2] = true;
             contentEncoding = encoding.getValue();
+        } else {
+        		coverageLoad[3] = true;
         }
 
         Charset charset;
         try {
             charset = ContentType.getOrDefault(entity).getCharset();
         } catch (Exception e) {
+    			coverageLoad[4] = true;
             logger.warn("parse charset failed: {}", e.getMessage());
             charset = Charset.forName("UTF-8");
         }
 
         if (charset != null) {
+    			coverageLoad[5] = true;
             contentCharset = charset.displayName();
+        } else {
+        		coverageLoad[6] = true;
         }
-
+        
         contentData = toByteArray(entity, maxBytes);
+        Page.createFile("load_coverage", coverageLoad);
     }
 
     public WebURL getWebURL() {
@@ -306,4 +343,19 @@ public class Page {
     public boolean isTruncated() {
         return truncated;
     }
+    
+	public static void createFile(String fileName, boolean[] coverage) {
+	    	StringBuilder contents = new StringBuilder().append(Arrays.toString(coverage));
+	    	int count = 0;
+	    	for (int i = 0 ; i < coverage.length ; i++) {
+	    		if(coverage[i]) {count++;}
+	    	}
+	    	float percentCovered = (float) count / coverage.length;
+	    	contents.append("\n" + percentCovered * 100 + "%");
+	    	try {
+	    		Writer output = new BufferedWriter(new FileWriter(new File("test_coverage/" + fileName)));
+	    	    output.write(contents.toString());
+	    		output.close();
+	    	} catch(Exception e) { e.printStackTrace(); }
+	}
 }

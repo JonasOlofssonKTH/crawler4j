@@ -17,7 +17,17 @@
 
 package edu.uci.ics.crawler4j.url;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.Writer;
+import java.util.Arrays;
+
 public final class UrlResolver {
+	
+	static boolean[] resolveUrlCoverage1 = new boolean[24];
+	static boolean[] resolveUrlCoverage2 = new boolean[33];
+	static boolean[] toStringCoverage = new boolean[13];
 
     /**
      * Resolves a given relative URL against a base URL. See
@@ -80,6 +90,8 @@ public final class UrlResolver {
      * @return the parsed specification.
      */
     private static Url parseUrl(final String spec) {
+
+    		resolveUrlCoverage1[0] = true;
         final Url url = new Url();
         int startIndex = 0;
         int endIndex = spec.length();
@@ -101,8 +113,11 @@ public final class UrlResolver {
         final int crosshatchIndex = indexOf(spec, '#', startIndex, endIndex);
 
         if (crosshatchIndex >= 0) {
+    			resolveUrlCoverage1[1] = true;
             url.fragment = spec.substring(crosshatchIndex + 1, endIndex);
             endIndex = crosshatchIndex;
+        } else{
+			resolveUrlCoverage1[2] = true;
         }
         // Section 2.4.2: Parsing the Scheme
         //
@@ -115,11 +130,17 @@ public final class UrlResolver {
         final int colonIndex = indexOf(spec, ':', startIndex, endIndex);
 
         if (colonIndex > 0) {
+    			resolveUrlCoverage1[3] = true;
             final String scheme = spec.substring(startIndex, colonIndex);
             if (isValidScheme(scheme)) {
+        			resolveUrlCoverage1[4] = true;
                 url.scheme = scheme;
                 startIndex = colonIndex + 1;
+            } else {
+    				resolveUrlCoverage1[5] = true;
             }
+        } else {
+			resolveUrlCoverage1[6] = true;
         }
         // Section 2.4.3: Parsing the Network Location/Login
         //
@@ -137,12 +158,17 @@ public final class UrlResolver {
         int locationEndIndex;
 
         if (spec.startsWith("//", startIndex)) {
+    			resolveUrlCoverage1[7] = true;
             locationStartIndex = startIndex + 2;
             locationEndIndex = indexOf(spec, '/', locationStartIndex, endIndex);
             if (locationEndIndex >= 0) {
+        			resolveUrlCoverage1[8] = true;
                 startIndex = locationEndIndex;
+            } else{
+    				resolveUrlCoverage1[9] = true;
             }
         } else {
+			resolveUrlCoverage1[10] = true;
             locationStartIndex = -1;
             locationEndIndex = -1;
         }
@@ -158,15 +184,21 @@ public final class UrlResolver {
         final int questionMarkIndex = indexOf(spec, '?', startIndex, endIndex);
 
         if (questionMarkIndex >= 0) {
+			resolveUrlCoverage1[11] = true;
             if ((locationStartIndex >= 0) && (locationEndIndex < 0)) {
+    				resolveUrlCoverage1[12] = true;
                 // The substring of characters after the double-slash and up to, but not
                 // including, the question mark "?" character is the network location/login
                 // (<net_loc>) of the URL.
                 locationEndIndex = questionMarkIndex;
                 startIndex = questionMarkIndex;
+            } else {
+    				resolveUrlCoverage1[13] = true;
             }
             url.query = spec.substring(questionMarkIndex + 1, endIndex);
             endIndex = questionMarkIndex;
+        } else {
+			resolveUrlCoverage1[14] = true;
         }
         // Section 2.4.5: Parsing the Parameters
         //
@@ -179,15 +211,21 @@ public final class UrlResolver {
         final int semicolonIndex = indexOf(spec, ';', startIndex, endIndex);
 
         if (semicolonIndex >= 0) {
+			resolveUrlCoverage1[15] = true;
             if ((locationStartIndex >= 0) && (locationEndIndex < 0)) {
+    				resolveUrlCoverage1[16] = true;
                 // The substring of characters after the double-slash and up to, but not
                 // including, the semicolon ";" character is the network location/login
                 // (<net_loc>) of the URL.
                 locationEndIndex = semicolonIndex;
                 startIndex = semicolonIndex;
+            } else {
+    				resolveUrlCoverage1[17] = true;
             }
             url.parameters = spec.substring(semicolonIndex + 1, endIndex);
             endIndex = semicolonIndex;
+        } else {
+			resolveUrlCoverage1[18] = true;
         }
         // Section 2.4.6: Parsing the Path
         //
@@ -198,16 +236,24 @@ public final class UrlResolver {
         //   differentiate between relative and absolute paths. Often this is
         //   done by simply storing the preceding slash along with the path.
         if ((locationStartIndex >= 0) && (locationEndIndex < 0)) {
+			resolveUrlCoverage1[19] = true;
             // The entire remaining parse string is assigned to the network
             // location/login (<net_loc>) of the URL.
             locationEndIndex = endIndex;
         } else if (startIndex < endIndex) {
+			resolveUrlCoverage1[20] = true;
             url.path = spec.substring(startIndex, endIndex);
+        } else {
+			resolveUrlCoverage1[21] = true;
         }
         // Set the network location/login (<net_loc>) of the URL.
         if ((locationStartIndex >= 0) && (locationEndIndex >= 0)) {
+			resolveUrlCoverage1[22] = true;
             url.location = spec.substring(locationStartIndex, locationEndIndex);
+        } else {
+			resolveUrlCoverage1[23] = true;
         }
+        createFile("parseUrl1_coverage", resolveUrlCoverage1);
         return url;
     }
 
@@ -251,13 +297,18 @@ public final class UrlResolver {
      * @return the resolved specification.
      */
     private static Url resolveUrl(final Url baseUrl, final String relativeUrl) {
+		resolveUrlCoverage2[0] = true;
         final Url url = parseUrl(relativeUrl);
         // Step 1: The base URL is established according to the rules of
         //         Section 3.  If the base URL is the empty string (unknown),
         //         the embedded URL is interpreted as an absolute URL and
         //         we are done.
         if (baseUrl == null) {
+    			resolveUrlCoverage2[1] = true;
+    	        createFile("resolveUrl_coverage", resolveUrlCoverage2);
             return url;
+        } else {
+        		resolveUrlCoverage2[2] = true;
         }
         // Step 2: Both the base and embedded URLs are parsed into their
         //         component parts as described in Section 2.4.
@@ -265,12 +316,21 @@ public final class UrlResolver {
         //         entire base URL (i.e., is set equal to the base URL)
         //         and we are done.
         if (relativeUrl.isEmpty()) {
+    			resolveUrlCoverage2[3] = true;
+    	        createFile("resolveUrl_coverage", resolveUrlCoverage2);
             return new Url(baseUrl);
+        } else {
+        		resolveUrlCoverage2[4] = true;
         }
+
         //      b) If the embedded URL starts with a scheme name, it is
         //         interpreted as an absolute URL and we are done.
         if (url.scheme != null) {
+    			resolveUrlCoverage2[5] = true;
+    	        createFile("resolveUrl_coverage", resolveUrlCoverage2);
             return url;
+        } else {
+        		resolveUrlCoverage2[6] = true;
         }
         //      c) Otherwise, the embedded URL inherits the scheme of
         //         the base URL.
@@ -279,36 +339,58 @@ public final class UrlResolver {
         //         Step 7.  Otherwise, the embedded URL inherits the <net_loc>
         //         (if any) of the base URL.
         if (url.location != null) {
+    			resolveUrlCoverage2[7] = true;
+    	        createFile("resolveUrl_coverage", resolveUrlCoverage2);
             return url;
+        } else {
+        		resolveUrlCoverage2[8] = true;
         }
+
         url.location = baseUrl.location;
         // Step 4: If the embedded URL path is preceded by a slash "/", the
         //         path is not relative and we skip to Step 7.
         if ((url.path != null) && ((!url.path.isEmpty()) && (url.path.charAt(0) == '/'))) {
+    			resolveUrlCoverage2[9] = true;
             url.path = removeLeadingSlashPoints(url.path);
+	        createFile("resolveUrl_coverage", resolveUrlCoverage2);
             return url;
+        } else {
+        		resolveUrlCoverage2[10] = true;
         }
         // Step 5: If the embedded URL path is empty (and not preceded by a
         //         slash), then the embedded URL inherits the base URL path,
         //         and
         if (url.path == null) {
+    			resolveUrlCoverage2[11] = true;
             url.path = baseUrl.path;
             //  a) if the embedded URL's <params> is non-empty, we skip to
             //     step 7; otherwise, it inherits the <params> of the base
             //     URL (if any) and
             if (url.parameters != null) {
+        			resolveUrlCoverage2[12] = true;
+        	        createFile("resolveUrl_coverage", resolveUrlCoverage2);
                 return url;
+            } else {
+            		resolveUrlCoverage2[13] = true;
             }
             url.parameters = baseUrl.parameters;
             //  b) if the embedded URL's <query> is non-empty, we skip to
             //     step 7; otherwise, it inherits the <query> of the base
             //     URL (if any) and we skip to step 7.
             if (url.query != null) {
+        			resolveUrlCoverage2[14] = true;
+        	        createFile("resolveUrl_coverage", resolveUrlCoverage2);
                 return url;
+            } else {
+    				resolveUrlCoverage1[15] = true;
             }
             url.query = baseUrl.query;
+	        createFile("resolveUrl_coverage", resolveUrlCoverage2);
             return url;
+        } else {
+    			resolveUrlCoverage2[16] = true;
         }
+
         // Step 6: The last segment of the base URL's path (anything
         //         following the rightmost slash "/", or the entire path if no
         //         slash is present) is removed and the embedded URL's path is
@@ -318,12 +400,17 @@ public final class UrlResolver {
         String path = "";
 
         if (basePath != null) {
+    			resolveUrlCoverage2[17] = true;
             final int lastSlashIndex = basePath.lastIndexOf('/');
 
             if (lastSlashIndex >= 0) {
+        			resolveUrlCoverage2[18] = true;
                 path = basePath.substring(0, lastSlashIndex + 1);
+            } else {
+    				resolveUrlCoverage2[19] = true;
             }
         } else {
+    			resolveUrlCoverage2[20] = true;
             path = "/";
         }
         path = path.concat(url.path);
@@ -332,13 +419,17 @@ public final class UrlResolver {
         int pathSegmentIndex;
 
         while ((pathSegmentIndex = path.indexOf("/./")) >= 0) {
+    			resolveUrlCoverage2[21] = true;
             path = path.substring(0, pathSegmentIndex + 1)
                        .concat(path.substring(pathSegmentIndex + 3));
         }
         //      b) If the path ends with "." as a complete path segment,
         //         that "." is removed.
         if (path.endsWith("/.")) {
+    			resolveUrlCoverage2[22] = true;
             path = path.substring(0, path.length() - 1);
+        } else{
+			resolveUrlCoverage2[23] = true;
         }
         //      c) All occurrences of "<segment>/../", where <segment> is a
         //         complete path segment not equal to "..", are removed.
@@ -346,27 +437,41 @@ public final class UrlResolver {
         //         removing the leftmost matching pattern on each iteration,
         //         until no matching pattern remains.
         while ((pathSegmentIndex = path.indexOf("/../")) > 0) {
+    			resolveUrlCoverage2[24] = true;
             final String pathSegment = path.substring(0, pathSegmentIndex);
             final int slashIndex = pathSegment.lastIndexOf('/');
 
             if (slashIndex < 0) {
+        			resolveUrlCoverage2[25] = true;
                 continue;
+            } else {
+            		resolveUrlCoverage2[26] = true;
             }
+
             if (!"..".equals(pathSegment.substring(slashIndex))) {
+        			resolveUrlCoverage2[27] = true;
                 path =
                     path.substring(0, slashIndex + 1).concat(path.substring(pathSegmentIndex + 4));
+            } else {
+    				resolveUrlCoverage2[28] = true;
             }
         }
         //      d) If the path ends with "<segment>/..", where <segment> is a
         //         complete path segment not equal to "..", that
         //         "<segment>/.." is removed.
         if (path.endsWith("/..")) {
+    			resolveUrlCoverage2[29] = true;
             final String pathSegment = path.substring(0, path.length() - 3);
             final int slashIndex = pathSegment.lastIndexOf('/');
 
             if (slashIndex >= 0) {
+        			resolveUrlCoverage2[30] = true;
                 path = path.substring(0, slashIndex + 1);
+            } else {
+    				resolveUrlCoverage2[31] = true;
             }
+        } else {
+			resolveUrlCoverage2[32] = true;
         }
 
         path = removeLeadingSlashPoints(path);
@@ -375,6 +480,7 @@ public final class UrlResolver {
         // Step 7: The resulting URL components, including any inherited from
         //         the base URL, are recombined to give the absolute form of
         //         the embedded URL.
+        createFile("resolveUrl_coverage", resolveUrlCoverage2);
         return url;
     }
 
@@ -428,34 +534,71 @@ public final class UrlResolver {
          *
          * @return a string representation of the <tt>Url</tt> object.
          */
+        
+        
         @Override
         public String toString() {
+        		toStringCoverage[0] = true;
             final StringBuilder sb = new StringBuilder();
 
             if (scheme != null) {
+        			toStringCoverage[1] = true;
                 sb.append(scheme);
                 sb.append(':');
+            } else {
+            		toStringCoverage[2] = true;
             }
             if (location != null) {
+    				toStringCoverage[3] = true;
                 sb.append("//");
                 sb.append(location);
+            } else {
+            		toStringCoverage[4] = true;
             }
             if (path != null) {
+    				toStringCoverage[5] = true;
                 sb.append(path);
+            } else {
+            		toStringCoverage[6] = true;
             }
             if (parameters != null) {
+    				toStringCoverage[7] = true;
                 sb.append(';');
                 sb.append(parameters);
+            } else {
+            		toStringCoverage[8] = true;
             }
             if (query != null) {
+    				toStringCoverage[9] = true;
                 sb.append('?');
                 sb.append(query);
+            } else {
+            		toStringCoverage[10] = true;
             }
             if (fragment != null) {
+    				toStringCoverage[11] = true;
                 sb.append('#');
                 sb.append(fragment);
+            } else {
+            		toStringCoverage[12] = true;
             }
+            UrlResolver.createFile("toString_coverage", toStringCoverage);
             return sb.toString();
         }
     }
+    
+	public static void createFile(String fileName, boolean[] coverage) {
+	    	StringBuilder contents = new StringBuilder().append(Arrays.toString(coverage));
+	    	int count = 0;
+	    	for (int i = 0 ; i < coverage.length ; i++) {
+	    		if(coverage[i]) {count++;}
+	    	}
+	    	float percentCovered = (float) count / coverage.length;
+	    	contents.append("\n" + percentCovered * 100 + "%");
+	    	try {
+	    		Writer output = new BufferedWriter(new FileWriter(new File("test_coverage/" + fileName)));
+	    	    output.write(contents.toString());
+	    		output.close();
+	    	} catch(Exception e) { e.printStackTrace(); }	
+	}
 }

@@ -17,8 +17,12 @@
 
 package edu.uci.ics.crawler4j.url;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.Serializable;
-
+import java.io.Writer;
+import java.util.Arrays;
 import java.util.Map;
 
 import com.sleepycat.persist.model.Entity;
@@ -65,10 +69,12 @@ public class WebURL implements Serializable {
     public String getURL() {
         return url;
     }
+    
+    static boolean[] coverage = new boolean[9];
 
     public void setURL(String url) {
         this.url = url;
-
+        coverage[0] = true;
         int domainStartIdx = url.indexOf("//") + 2;
         int domainEndIdx = url.indexOf('/', domainStartIdx);
         domainEndIdx = (domainEndIdx > domainStartIdx) ? domainEndIdx : url.length();
@@ -76,15 +82,23 @@ public class WebURL implements Serializable {
         subDomain = "";
         String[] parts = domain.split("\\.");
         if (parts.length > 2) {
+            coverage[1] = true;
             domain = parts[parts.length - 2] + "." + parts[parts.length - 1];
             int limit = 2;
             if (TLDList.getInstance().contains(domain)) {
+                coverage[2] = true;
                 domain = parts[parts.length - 3] + "." + domain;
                 limit = 3;
+            } else {
+                coverage[3] = true;
             }
             for (int i = 0; i < (parts.length - limit); i++) {
+                coverage[4] = true;
                 if (!subDomain.isEmpty()) {
+                    coverage[5] = true;
                     subDomain += ".";
+                } else {
+                    coverage[6] = true;
                 }
                 subDomain += parts[i];
             }
@@ -92,8 +106,12 @@ public class WebURL implements Serializable {
         path = url.substring(domainEndIdx);
         int pathEndIdx = path.indexOf('?');
         if (pathEndIdx >= 0) {
+            coverage[7] = true;
             path = path.substring(0, pathEndIdx);
+        } else {
+            coverage[8] = true;
         }
+        WebURL.createFile("setURL_coverage", coverage);
     }
 
     /**
@@ -233,4 +251,19 @@ public class WebURL implements Serializable {
     public String toString() {
         return url;
     }
+    
+	public static void createFile(String fileName, boolean[] coverage) {
+	    	StringBuilder contents = new StringBuilder().append(Arrays.toString(coverage));
+	    	int count = 0;
+	    	for (int i = 0 ; i < coverage.length ; i++) {
+	    		if(coverage[i]) {count++;}
+	    	}
+	    	float percentCovered = (float) count / coverage.length;
+	    	contents.append("\n" + percentCovered * 100 + "%");
+	    	try {
+	    		Writer output = new BufferedWriter(new FileWriter(new File("test_coverage/" + fileName)));
+	    	    output.write(contents.toString());
+	    		output.close();
+	    	} catch(Exception e) { e.printStackTrace(); }	
+	}
 }
