@@ -91,6 +91,9 @@ public class PageFetcher extends Configurable {
     
 	boolean[] coverage = new boolean[21];
 
+    public Map<AuthScope, Credentials> credentialsMap;
+    public HttpHost proxy;
+
     public PageFetcher(CrawlConfig config) {
         super(config);
         
@@ -148,7 +151,7 @@ public class PageFetcher extends Configurable {
         clientBuilder.setUserAgent(config.getUserAgentString());
         clientBuilder.setDefaultHeaders(config.getDefaultHeaders());
 
-        Map<AuthScope, Credentials> credentialsMap = new HashMap<>();
+        credentialsMap = new HashMap<>();
         if (config.getProxyHost() != null) {
             coverage[7] = true;
             if (config.getProxyUsername() != null) {
@@ -161,7 +164,7 @@ public class PageFetcher extends Configurable {
             		coverage[9] = true;
             }
 
-            HttpHost proxy = new HttpHost(config.getProxyHost(), config.getProxyPort());
+            proxy = new HttpHost(config.getProxyHost(), config.getProxyPort());
             clientBuilder.setProxy(proxy);
             logger.debug("Working through Proxy: {}", proxy.getHostName());
         } else {
@@ -426,6 +429,7 @@ public class PageFetcher extends Configurable {
 	    	contents.append("\n" + percentCovered * 100 + "%");
 	    	try {
 	    		Writer output = new BufferedWriter(new FileWriter(new File("test_coverage/" + fileName)));
+	    		
 	    	    output.write(contents.toString());
 	    		output.close();
 	    	} catch(Exception e) { e.printStackTrace(); }
