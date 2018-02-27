@@ -50,7 +50,7 @@ public class ParserTest {
 	@Test
 	public void parseTest3()  throws InstantiationException, IllegalAccessException, NotAllowedContentException, ParseException {
 		// Contract: parse should parse page as html if content-type contains the word html and the amount of urls should be equal to the
-		// number of urls in the text which in this case is one.
+		// number of urls in the text which in this case is zero.
 		CrawlConfig config = new CrawlConfig();
 		Page page = new Page(null);
 		page.setContentType("html");
