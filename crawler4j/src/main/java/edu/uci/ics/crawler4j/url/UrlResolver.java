@@ -37,7 +37,7 @@ public final class UrlResolver {
             throw new IllegalArgumentException("Relative URL must not be null");
         }
 
-        final Url url = resolveUrl(parseUrl(baseUrl.trim()), relativeUrl.trim());
+        final Url url = resolveUrlObject(parseUrl(baseUrl.trim()), relativeUrl.trim());
         return url.toString();
     }
 
@@ -79,7 +79,7 @@ public final class UrlResolver {
      * @param spec The specification to parse.
      * @return the parsed specification.
      */
-    private static Url parseUrl(final String spec) {
+    public static Url parseUrl(final String spec) {
         final Url url = new Url();
         int startIndex = 0;
         int endIndex = spec.length();
@@ -250,7 +250,7 @@ public final class UrlResolver {
      * @param relativeUrl The relative URL to resolve against the base URL.
      * @return the resolved specification.
      */
-    private static Url resolveUrl(final Url baseUrl, final String relativeUrl) {
+    public static Url resolveUrlObject(final Url baseUrl, final String relativeUrl) {
         final Url url = parseUrl(relativeUrl);
         // Step 1: The base URL is established according to the rules of
         //         Section 3.  If the base URL is the empty string (unknown),
@@ -394,7 +394,7 @@ public final class UrlResolver {
      *
      * @author Martin Tamme
      */
-    private static class Url {
+    public static class Url {
         String scheme;
         String location;
         String path;
