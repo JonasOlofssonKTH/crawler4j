@@ -36,6 +36,15 @@ public class RobotstxtParser {
     private static final Set<String> VALID_RULES = new HashSet<String>(
         Arrays.asList("allow", "disallow", "user-agent", "crawl-delay", "host", "sitemap"));
 
+
+   /**
+    * Parses the crawling rules contained in the string passed as argument and
+    * returns the rules as a HostDirective object.
+    * @Param String content - the string to be parsed
+    * @Param RobotstxtConfig config - the configuration of the current crawl.
+    * @Return HostDirectives 
+    */
+
     public static HostDirectives parse(String content, RobotstxtConfig config) {
         HostDirectives directives = new HostDirectives(config);
         StringTokenizer st = new StringTokenizer(content, "\n\r");

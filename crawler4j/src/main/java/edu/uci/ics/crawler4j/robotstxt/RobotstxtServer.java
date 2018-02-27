@@ -94,6 +94,14 @@ public class RobotstxtServer {
         return true;
     }
 
+    /**
+     * Downlaods and inspects the robots.txt file which contains rules describing how the owners
+     * of a site wishes web crawlers to behave when visiting their site. This function parses the rules
+     * and returns them as a HostDirectives object.
+     *
+     * @Return HostDirectives - A set of rules that the crawler should follow.
+     */
+
     private HostDirectives fetchDirectives(URL url) {
         WebURL robotsTxtUrl = new WebURL();
         String host = getHost(url);
@@ -106,7 +114,7 @@ public class RobotstxtServer {
         try {
             for (int redir = 0; redir < 3; ++redir) {
                 fetchResult = pageFetcher.fetchPage(robotsTxtUrl);
-                int status = fetchResult.getStatusCode();
+                int status = fetchPagechResult.getStatusCode();
                 // Follow redirects up to 3 levels
                 if ((status == HttpStatus.SC_MULTIPLE_CHOICES ||
                      status == HttpStatus.SC_MOVED_PERMANENTLY ||

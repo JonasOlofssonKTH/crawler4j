@@ -238,6 +238,15 @@ public class PageFetcher extends Configurable {
         }
     }
 
+    /**
+     * Fetches the content associated with the URL given as argument using http requests.
+     * The result of the request is represented as a PageFetchResult object.
+     *
+     * @Param WebURL webUrl the url pointing to the page to download
+     * @throws PageBiggerThanMaxSizeException if the downloaded page is larger than the maximum allowed
+     * @Return PageFetchResult - the content of the fetches page wrapped in a PageFetchResult object.
+     */
+
     public PageFetchResult fetchPage(WebURL webUrl)
         throws InterruptedException, IOException, PageBiggerThanMaxSizeException {
         // Getting URL, setting headers & content

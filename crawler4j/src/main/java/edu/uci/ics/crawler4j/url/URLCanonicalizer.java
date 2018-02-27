@@ -45,6 +45,15 @@ public class URLCanonicalizer {
         return getCanonicalURL(href, context, StandardCharsets.UTF_8);
     }
 
+    /**
+     * The function normalizes the href string given as argument in order to get a canonical form of the 
+     * url with respect to the specified charset.
+     * @Param String href - the url string to be transformed
+     * @Param String context - the base url 
+     * @Param Charset charset - the charset we want our canicalized url to respect.
+     * @Return a url string on a canonical form
+     */
+
     public static String getCanonicalURL(String href, String context, Charset charset) {
 
         try {

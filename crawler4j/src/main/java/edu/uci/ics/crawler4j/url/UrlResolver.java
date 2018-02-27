@@ -26,6 +26,7 @@ public final class UrlResolver {
      *
      * @param baseUrl     The base URL in which to resolve the specification.
      * @param relativeUrl The relative URL to resolve against the base URL.
+     * @param IllegalArgumentException if baseUrl or relativeUrl is null
      * @return the resolved specification.
      */
     public static String resolveUrl(String baseUrl, String relativeUrl) {
