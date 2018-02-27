@@ -84,6 +84,9 @@ public class PageFetcher extends Configurable {
     protected long lastFetchTime = 0;
     protected IdleConnectionMonitorThread connectionMonitorThread = null;
 
+    public Map<AuthScope, Credentials> credentialsMap;
+    public HttpHost proxy;
+
     public PageFetcher(CrawlConfig config) {
         super(config);
 
@@ -131,7 +134,7 @@ public class PageFetcher extends Configurable {
         clientBuilder.setUserAgent(config.getUserAgentString());
         clientBuilder.setDefaultHeaders(config.getDefaultHeaders());
 
-        Map<AuthScope, Credentials> credentialsMap = new HashMap<>();
+        credentialsMap = new HashMap<>();
         if (config.getProxyHost() != null) {
             if (config.getProxyUsername() != null) {
                 AuthScope authScope = new AuthScope(config.getProxyHost(), config.getProxyPort());
@@ -140,7 +143,7 @@ public class PageFetcher extends Configurable {
                 credentialsMap.put(authScope, credentials);
             }
 
-            HttpHost proxy = new HttpHost(config.getProxyHost(), config.getProxyPort());
+            proxy = new HttpHost(config.getProxyHost(), config.getProxyPort());
             clientBuilder.setProxy(proxy);
             logger.debug("Working through Proxy: {}", proxy.getHostName());
         }
