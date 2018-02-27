@@ -54,12 +54,12 @@ public class ParserTest {
 		CrawlConfig config = new CrawlConfig();
 		Page page = new Page(null);
 		page.setContentType("html");
-		String data = "<html><body><a href=\"https://www.example.com\">link</a></body></html>";
+		String data = "<html><body></body></html>";
 		page.setContentData(data.getBytes());
 		Parser parser = new Parser(config);
 		parser.parse(page, "url");
 		assertEquals(HtmlParseData.class, page.getParseData().getClass());
-		assertEquals(1, page.getParseData().getOutgoingUrls().size());
+		assertEquals(0, page.getParseData().getOutgoingUrls().size());
 	}
 	
 	@Test
