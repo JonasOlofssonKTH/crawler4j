@@ -61,6 +61,17 @@ public class Parser extends Configurable {
         parseContext.set(HtmlMapper.class, AllTagMapper.class.newInstance());
     }
 
+    /**
+     * Parses the content of the page given as argument The parsed data is saved in the 
+     * in the parseData property of the page given as argument. If the content of the page
+     * contains url, these are saved in the outgoingUrls propety of the page. 
+     * 
+     * @param page the page to be parsed
+     * @param contextURL ?
+     * @throws NotAllowedContentException if the page contains binary data when this kind of pages are prohibited in the crawl config.
+     * @throws ParseException if the parsing of the page content fails
+     */ 
+
     public void parse(Page page, String contextURL)
         throws NotAllowedContentException, ParseException {
         if (Util.hasBinaryContent(page.getContentType())) { // BINARY
