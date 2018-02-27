@@ -51,4 +51,49 @@ public class UrlResolverTest {
         //Then
         assertEquals(url.toString(), "http://WebReference.com/foo/bar.html?baz");
     }
+    
+    @Test
+    public void shouldReturnSameURLWhenRelativeURLContainsNetworkLocation() {
+        //Given
+        String relativeUrl = "//WebReference.com/foo/bar.html?baz";
+        String baseUrl = "http://WebReference.com/";
+        //When
+        String url = UrlResolver.resolveUrl(baseUrl, relativeUrl);
+        //Then
+        assertEquals("http://WebReference.com/foo/bar.html?baz", url);
+    }
+    
+    
+    @Test
+    public void shouldInheritBaseUrlPathWhenRelativeUrlPathIsNullAndParametersAreNotNull() {
+        //Given
+        String relativeUrl = ";type=a?baz";
+        String baseUrl = "http://WebReference.com/foo/bar.html";
+        //When
+        String url = UrlResolver.resolveUrl(baseUrl, relativeUrl);
+        //Then
+        assertEquals("http://WebReference.com/foo/bar.html;type=a?baz", url);
+    }
+    
+    @Test
+    public void shouldInheritBaseUrlPathAndQueryWhenRelativePathIsFragment() {
+        //Given
+        String relativeUrl = "#fragment";
+        String baseUrl = "http://WebReference.com/foo/bar.html?baz";
+        //When
+        String url = UrlResolver.resolveUrl(baseUrl, relativeUrl);
+        //Then
+        assertEquals("http://WebReference.com/foo/bar.html?baz#fragment", url);
+    }
+    
+    @Test
+    public void shouldReturnRelativeUrlAppendedToBaseUrlWhenBaseUrlEndsInSlash() {
+        //Given
+        String relativeUrl = "foo/bar.html?baz";
+        String baseUrl = "http://WebReference.com/";
+        //When
+        String url = UrlResolver.resolveUrl(baseUrl, relativeUrl);
+        //Then
+        assertEquals("http://WebReference.com/foo/bar.html?baz", url);
+    }
 }
